@@ -56,7 +56,7 @@ struct ContentView: View {
                 Button("Cancel", role: .cancel) { }
             }
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(store.appTheme.colorScheme)
         .onChange(of: soundOn) { _, v in tick.enabled = v }
         .onAppear { store.load() }
         .onChange(of: store.projects.count) { _, _ in ensureSelection() }
@@ -78,7 +78,7 @@ struct ContentView: View {
             ZStack {
                 LinearGradient(colors: [Color.stageTop, Color.stageBottom],
                                startPoint: .top, endPoint: .bottom)
-                RadialGradient(colors: [Color.white.opacity(0.05), .clear],
+                RadialGradient(colors: [Color.stageGlow, .clear],
                                center: .center, startRadius: 0, endRadius: geo.size.width * 0.6)
 
                 if projects.isEmpty {
@@ -249,7 +249,7 @@ private struct HeaderBar: View {
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color.black.opacity(0.25))
+                .fill(Color.inset)
                 .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.chromeBorder, lineWidth: 1))
         )
     }
@@ -279,7 +279,7 @@ private struct HeaderBar: View {
         .padding(.horizontal, 11).padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color.black.opacity(0.25))
+                .fill(Color.inset)
                 .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.chromeBorder, lineWidth: 1))
         )
     }

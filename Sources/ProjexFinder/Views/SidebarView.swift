@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SidebarView: View {
     @Bindable var store: LibraryStore
+    @State private var showSettings = false
 
     private let collectionKinds: [ProjectKind] =
         [.web, .mobile, .desktop, .backend, .dataML, .tool]
@@ -42,10 +43,16 @@ struct SidebarView: View {
                           help: "Add a project folder to your library") { store.presentAddFolder() }
                 addButton("Add File", systemImage: "doc.badge.plus",
                           help: "Add a single file to your library") { store.presentAddFile() }
+                Divider().padding(.vertical, 4)
+                addButton("Settings", systemImage: "gearshape",
+                          help: "Appearance and preferences") { showSettings = true }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 8)
             .background(.thinMaterial)
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(store: store)
         }
     }
 

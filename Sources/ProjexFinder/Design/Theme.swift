@@ -1,4 +1,38 @@
 import SwiftUI
+import AppKit
+
+// MARK: - Appearance
+
+/// User-selectable appearance. `system` follows the macOS setting.
+enum AppTheme: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .system: return "System"
+        case .light:  return "Light"
+        case .dark:   return "Dark"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .system: return "circle.lefthalf.filled"
+        case .light:  return "sun.max"
+        case .dark:   return "moon.stars"
+        }
+    }
+
+    /// nil = follow the system; otherwise force light/dark.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light:  return .light
+        case .dark:   return .dark
+        }
+    }
+}
 
 // MARK: - App palette
 
@@ -94,11 +128,37 @@ struct CardTransform {
 }
 
 // MARK: - Shared chrome colors
+//
+// These adapt automatically to the effective appearance: a dynamic NSColor
+// resolves to its light or dark value whenever the view's appearance changes,
+// so the whole UI follows `.preferredColorScheme` with no per-view branching.
+
+private func dynamicColor(light: NSColor, dark: NSColor) -> Color {
+    Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? dark : light
+    })
+}
+
+private func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> NSColor {
+    NSColor(srgbRed: r, green: g, blue: b, alpha: a)
+}
 
 extension Color {
-    static let stageTop = Color(red: 0.10, green: 0.10, blue: 0.12)
-    static let stageBottom = Color(red: 0.02, green: 0.02, blue: 0.03)
-    static let chrome = Color(red: 0.13, green: 0.13, blue: 0.15)
-    static let chromeBorder = Color.white.opacity(0.08)
-    static let listAlt = Color.white.opacity(0.03)
+    static let stageTop = dynamicColor(
+        light: rgb(0.95, 0.95, 0.97), dark: rgb(0.10, 0.10, 0.12))
+    static let stageBottom = dynamicColor(
+        light: rgb(0.88, 0.88, 0.91), dark: rgb(0.02, 0.02, 0.03))
+    static let chrome = dynamicColor(
+        light: rgb(0.97, 0.97, 0.99), dark: rgb(0.13, 0.13, 0.15))
+    static let chromeBorder = dynamicColor(
+        light: rgb(0, 0, 0, 0.10), dark: rgb(1, 1, 1, 0.08))
+    static let listAlt = dynamicColor(
+        light: rgb(0, 0, 0, 0.03), dark: rgb(1, 1, 1, 0.03))
+
+    /// Inset background for the now-playing + search pills.
+    static let inset = dynamicColor(
+        light: rgb(0, 0, 0, 0.05), dark: rgb(0, 0, 0, 0.25))
+    /// Soft center bloom on the cover stage.
+    static let stageGlow = dynamicColor(
+        light: rgb(1, 1, 1, 0.45), dark: rgb(1, 1, 1, 0.05))
 }

@@ -22,6 +22,11 @@ final class LibraryStore {
     var searchText = ""
     var filter: LibraryFilter = .allProjects
 
+    /// Selected appearance; persisted and applied at the app root.
+    var appTheme: AppTheme {
+        didSet { UserDefaults.standard.set(appTheme.rawValue, forKey: "appTheme") }
+    }
+
     private var favorites: Set<String>
     private var addedURLs: [URL]
     private var customCovers: [String: String]   // project path → cached image path
@@ -37,6 +42,7 @@ final class LibraryStore {
         addedURLs = (UserDefaults.standard.stringArray(forKey: "addedPaths") ?? [])
             .map { URL(fileURLWithPath: $0) }
         customCovers = (UserDefaults.standard.dictionary(forKey: "customCovers") as? [String: String]) ?? [:]
+        appTheme = AppTheme(rawValue: UserDefaults.standard.string(forKey: "appTheme") ?? "") ?? .dark
     }
 
     // MARK: - Loading
